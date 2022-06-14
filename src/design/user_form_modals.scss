@@ -1,0 +1,163 @@
+#add-edit-user {
+    .card {
+      width:100% !important;
+      padding: 15px;
+    }
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+  #add-edit-user.modal{
+    overflow-y:auto;
+  }
+  
+  #add-edit-user .modal-content, #add-edit-user .modal-card{
+      max-height: none !important;
+      height: 100% !important;
+      margin-right: 0;
+      margin-left: 0;
+  }
+  .main-user-form{
+    width:100%;
+    margin:0 auto;
+  }
+  .delete {
+    font-size: 20px;
+    padding-top: 0;
+  }
+  
+  .actions {
+    justify-content:flex-end;
+    width:100%;
+    padding: 1rem 0 25px 0;
+  }
+  
+  .user-avatar {
+    position: relative;
+  
+    .add-image-action {
+      color: #dadada;
+      font-size: 25px;
+      position: absolute;
+      bottom: 65px;
+      left: 65px;
+      width: 17px;
+      height: 16px;
+    }
+  }
+  .main-user-form .form-btn{
+    width:65%;
+    justify-content: space-between;
+    @media only screen and (max-width: 670px){
+      width:100%;
+      flex-wrap: wrap;
+    }
+  }
+  .upper-form-row{
+    width:100%;
+    display: grid;
+    gap: 4px 20px;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: space-between;
+    @media only screen and (max-width: 450px){
+      grid-template-columns: 100%;
+    }
+  }
+  .modal-subtitle{
+    font-size: 20px;
+    font-weight: 500;
+    margin:16px 0 8px 0;
+  }
+  #add-edit-user .modal-dialog , #add-edit-user .modal-content{
+    @media only screen and (max-width: 630px){
+      border-radius: 0;
+    }
+  }
+  #add-edit-user .modal-dialog {
+    
+    @media only screen and (max-width: 630px){
+      width:100% !important;
+      margin: 0 !important;
+    }
+  }
+  .personal-information {
+    .form-row {
+      display:flex;
+      align-items:center;
+      width:100%;
+      
+    }
+    .col-form-label{
+      white-space:nowrap;
+      word-break: keep-all;
+    }
+    .min-size{
+      min-width:227px;
+    }
+  }
+  .main-user-form .form-group{
+    display:flex;
+    flex-wrap: wrap;
+    align-items:center;
+
+  }
+  .main-user-form#userType .bv-no-focus-ring{
+    @media only screen and (max-width:670px) {
+      width:100% !important;
+    }
+  }
+  .personal-information .form-group{
+    display:flex;
+    flex-direction: row;
+      justify-content:space-between;
+    padding-top: 1rem;
+    border-top: 1px solid #ebebeb;
+  }
+  .user-form-row{
+    // width:100%;
+    // display: grid;
+    // gap:10px;
+    // align-items:center;
+    // grid-template-columns: repeat(2, 1fr);
+    // .form-group{
+    //   margin:0 auto;
+    //   text-align:center;
+    //   margin-bottom:10px;
+    // }
+    @media only screen and (max-width: 600px){
+        grid-template-columns: 100%;
+        padding-bottom:14px;
+    }
+  }
+  .personal-information .form-groups > :first-child{
+    border: none;
+  }
+  .main-user-form .logo {
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+  }
+  .main-user-form .btn-lg,
+  .main-user-form .btn-group-lg > .btn {
+    padding: 0.5rem 3rem !important;
+  }
+  .custom-card, .form-horizontal{
+    width:100%;
+  }
+  #role label, #department label{
+    width: 100px;
+  }
+  .form-del-btn{
+    font-size: 14px;
+    font-weight: 500;
+    background-color: transparent;
+    border: none;
+    color: #111;
+    transition: color 0.2s linear;
+  }
+  .form-del-btn:hover, .form-del-btn:hover i{
+    color: rgb(0, 0, 0);
+  }
+  .form-del-btn i{
+    font-size: 21px;
+    transition: color 0.2s linear;
+  }

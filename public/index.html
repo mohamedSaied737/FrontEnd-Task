@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      sizes="192×192"
+      href="<%= BASE_URL %>favicon.ico"
+    />
+    <meta content="Visipoint" name="description" />
+    <script src="https://js.chargebee.com/v2/chargebee.js"></script>
+
+    <!-- start Gist JS code-->
+    <script>
+      (function(d, h, w) {
+        var gist = (w.gist = w.gist || []);
+        gist.methods = ["trackPageView", "identify", "track", "setAppId"];
+        gist.factory = function(t) {
+          return function() {
+            var e = Array.prototype.slice.call(arguments);
+            e.unshift(t);
+            gist.push(e);
+            return gist;
+          };
+        };
+        for (var i = 0; i < gist.methods.length; i++) {
+          var c = gist.methods[i];
+          gist[c] = gist.factory(c);
+        }
+        (s = d.createElement("script")),
+          (s.src = "https://widget.getgist.com"),
+          (s.async = !0),
+          (e = d.getElementsByTagName(h)[0]),
+          e.appendChild(s),
+          s.addEventListener("load", function(e) {}, !1),
+          gist.setAppId("cstehcwd"),
+          gist.trackPageView();
+      })(document, "head", window);
+    </script>
+    <!-- end Gist JS code-->
+  </head>
+
+  <body>
+    <noscript>
+      <strong
+        >We're sorry but Visipoint doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong
+      >
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <script type="text/javascript">
+      window.help_company_key = "ca388fea271b779610f57ea9";
+      window.helppier_app_id = "LL9kdZ7xmCWcvtxQa";
+      var script = document.createElement("script");
+      script.setAttribute("id", "helppierEmbed");
+      script.setAttribute("defer", "");
+      script.setAttribute(
+        "src",
+        "https://km.helppier.com/widget/js/start.js?help_company_key=" +
+          window.help_company_key
+      );
+      document.head.appendChild(script);
+
+      function openBilling() {
+        var chargebeeInstance = Chargebee.init({
+          site: "visipoint",
+        });
+        var chargebeeInstance = Chargebee.getInstance();
+        let cbPortal = chargebeeInstance.createChargebeePortal();
+        cbPortal.open();
+      }
+    </script>
+  </body>
+</html>

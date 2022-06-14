@@ -1,0 +1,325 @@
+stages:
+  - develop
+  - qa
+  - prelive
+  - production
+  - feature
+
+### Develop branch for test purpose ###
+
+Test-Docker:
+  stage: develop
+  image: node:lts-buster
+  variables:
+    VUE_APP_BASE_URL: https://apitest.visipoint.dev
+    VUE_APP_BASE_URL_PASSPORT: https://apptest.visipoint.me
+    VUE_APP_DOMAIN: https://apitest.visipoint.dev
+    VUE_APP_EXPORT_LIST_COUNT: 100    
+    VUE_APP_PASSPORT_KEY: UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$QA_DOCKER_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - echo "PASSPORT_KEY=UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA" >> .env
+    - echo "EXPORT_LIST_COUNT=100" >> .env
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - apt-get update -y
+    - apt-get -y install rsync
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@api.d.visipoint.dev:traefik/test/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: develop
+    url: https://apptest.visipoint.dev/
+  only:
+    - develop
+
+### QA branch ###
+
+QA-Docker:
+  stage: qa
+  image: node:lts-buster
+  variables:
+    VUE_APP_BASE_URL: https://qa.api.d.visipoint.dev
+    VUE_APP_DOMAIN: https://qa.app.d.visipoint.dev
+    VUE_APP_BASE_URL_PASSPORT: https://apiqa.visipoint.me
+    VUE_APP_BASE_URL_PASSPORT_REDIRECT: https://appqa.visipoint.me
+    VUE_APP_EXPORT_LIST_COUNT: 100
+    VUE_APP_GRID_SYNC_URL: https://grid.qa.visipoint.dev
+    VUE_APP_PRE_REGISTRATION_URL: pre-registration
+    VUE_APP_DAEMON_BASE_URL: daemon.qa.visipoint.dev
+    VUE_APP_PASSPORT_KEY: UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA
+
+  before_script:
+    - eval $(ssh-agent -s) 
+    - echo "$QA_DOCKER_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - apt-get update -y
+    - apt-get -y install rsync
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@api.d.visipoint.dev:traefik/qa/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: QA-Docker
+    url: https://qa.app.d.visipoint.dev
+  #when: manual
+  only:
+    - qa
+  #tags:
+  #  - qa-docker
+
+qaus-Docker:
+  stage: qa
+  image: node:lts-buster
+  needs:
+    - QA-Docker
+  variables:
+    VUE_APP_BASE_URL: https://qaus.api.d.visipoint.dev
+    VUE_APP_BASE_URL_PASSPORT: https://apiqa.visipoint.me
+    VUE_APP_BASE_URL_PASSPORT_REDIRECT: https://appqa.visipoint.me
+    VUE_APP_DOMAIN: https://qaus.app.d.visipoint.dev
+    VUE_APP_EXPORT_LIST_COUNT: 100
+    VUE_APP_PRE_REGISTRATION_URL: pre-registration
+    VUE_APP_DAEMON_BASE_URL: daemon.qa.visipoint.dev
+    VUE_APP_PASSPORT_KEY: UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA
+
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$QA_DOCKER_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - apt-get update -y
+    - apt-get -y install rsync
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@api.d.visipoint.dev:traefik/qaus/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: qaus
+    url: https://qaus.app.d.visipoint.dev
+  #when: manual
+  only:
+    - qa
+
+### Production ###
+
+UK:
+  stage: production
+  script:
+    - ci-vue-build ./ "$PRODUKROOTPATH/"
+  environment:
+    name: production/uk
+    url: https://visipoint.uk/
+  when: manual
+  only:
+    - release
+  tags:
+    - produk
+
+US:
+  stage: production
+  script:
+    - ci-vue-build ./ "$PRODUSROOTPATH/"
+  environment:
+    name: production/us
+    url: https://visipoint.us/
+  when: manual
+  only:
+    - release
+  tags:
+    - produs
+
+CA:
+  stage: production
+  image: node:lts-buster
+  variables:
+    VUE_APP_BASE_URL: https://api.visipoint.co
+    VUE_APP_BASE_URL_PASSPORT: https://visipoint.me
+    VUE_APP_BASE_URL_PASSPORT_REDIRECT: https://visipoint.me
+    VUE_APP_DOMAIN: https://visipoint.co
+    VUE_APP_EXPORT_LIST_COUNT: 100
+    VUE_APP_PRE_REGISTRATION_URL: pre-registration
+    VUE_APP_PASSPORT_KEY: "UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA"
+
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - apt-get update -y
+    - apt-get -y install rsync    
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@visipoint.co:/root/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: production/ca
+    url: https://visipoint.co/
+  when: manual
+  only:
+    - release
+
+US_APP_DOCKER:
+  stage: production
+  image: node:lts-buster
+  variables:
+    VUE_APP_BASE_URL: https://api.visipoint.us
+    VUE_APP_BASE_URL_PASSPORT: https://visipoint.me
+    VUE_APP_BASE_URL_PASSPORT_REDIRECT: https://visipoint.me
+    VUE_APP_DOMAIN: https://visipoint.us
+    VUE_APP_EXPORT_LIST_COUNT: 100
+    VUE_APP_PRE_REGISTRATION_URL: pre-registration
+    VUE_APP_PASSPORT_KEY: "UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA"
+
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - apt-get update -y
+    - apt-get -y install rsync    
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@visipoint.us:/root/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: production/us
+    url: https://visipoint.us/
+  when: manual
+  only:
+    - release
+
+UK_APP_DOCKER:
+  stage: production
+  image: node:lts-buster
+  variables:
+    VUE_APP_BASE_URL: https://api.visipoint.uk
+    VUE_APP_BASE_URL_PASSPORT: https://visipoint.me
+    VUE_APP_BASE_URL_PASSPORT_REDIRECT: https://visipoint.me
+    VUE_APP_DOMAIN: https://visipoint.uk
+    VUE_APP_EXPORT_LIST_COUNT: 100
+    VUE_APP_PRE_REGISTRATION_URL: pre-registration
+    VUE_APP_PASSPORT_KEY: "UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA"
+
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - apt-get update -y
+    - apt-get -y install rsync    
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@visipoint.uk:/root/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: production/uk
+    url: https://visipoint.uk/
+  when: manual
+  only:
+    - release
+
+### Prelive ###
+prelive-Docker:
+  stage: prelive
+  image: node:lts-buster
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$QA_DOCKER_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  variables:
+    VUE_APP_BASE_URL: https://prelive.api.d.visipoint.dev
+    VUE_APP_BASE_URL_PASSPORT: https://apiprelive.visipoint.me
+    VUE_APP_BASE_URL_PASSPORT_REDIRECT: https://appprelive.visipoint.me
+    VUE_APP_DOMAIN: https://prelive.app.d.visipoint.dev
+    VUE_APP_EXPORT_LIST_COUNT: 100
+    VUE_APP_PRE_REGISTRATION_URL: pre-registration
+    VUE_APP_DAEMON_BASE_URL: https://daemon.prelive.visipoint.dev
+    VUE_APP_PASSPORT_KEY: "UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA"
+    VUE_APP_GRID_SYNC_URL: https://grid.prelive.visipoint.dev
+
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - apt-get update -y
+    - apt-get -y install rsync
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@api.d.visipoint.dev:traefik/prelive/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: prelive
+    url: https://prelive.app.d.visipoint.dev
+  only:
+    - prelive
+
+prelive-us-Docker:
+  stage: prelive
+  needs:
+    - prelive-Docker
+  image: node:lts-buster
+  variables:
+    VUE_APP_BASE_URL: https://prelive-us.api.d.visipoint.dev
+    VUE_APP_BASE_URL_PASSPORT: https://apiprelive.visipoint.me
+    VUE_APP_BASE_URL_PASSPORT_REDIRECT: https://appprelive.visipoint.me
+    VUE_APP_DOMAIN: https://prelive-us.app.d.visipoint.dev
+    VUE_APP_DAEMON_BASE_URL: daemon.prelive.visipoint.dev
+    VUE_APP_EXPORT_LIST_COUNT: 100
+    VUE_APP_GRID_SYNC_URL: https://grid.prelive.visipoint.dev
+    VUE_APP_PRE_REGISTRATION_URL: pre-registration
+    VUE_APP_PASSPORT_KEY: UsHK3GSC3QbFAKWDpf2pdyA5tBLwMbvrvXy8B3JVp3aUhTbKAREXWM73VPUkjbxkWevVPQSps9D9ehUGnVTcL8cdKGtVXXR2tqKQYPgr9FPvMmTAJESQ3SRSYQ9rBWMA
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$QA_DOCKER_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+    - yarn install --ignore-engines
+    - yarn run --ignore-engines build
+    - apt-get update -y
+    - apt-get -y install rsync
+    - rsync -e "ssh -o StrictHostKeyChecking=no" -avh ./dist root@api.d.visipoint.dev:traefik/prelive-us/app --delete
+    #- sudo rsync -avh ./dist /root/app --delete
+  environment:
+    name: prelive-us
+    url: https://prelive-us.app.d.visipoint.dev
+  #when: manual
+  only:
+    - prelive
+
+
+### Other ###
+
+feature:
+  stage: feature
+  script:
+    - |
+      # branch name must be identical to the api.
+      export MY_HOST=$(echo ${CI_COMMIT_BRANCH,,} | sed 's/_/-/g')
+      mkdir -p $FEATURE_PRE_ROOT/$MY_HOST
+      echo "$FEATURE_PRE_ROOT/$MY_HOST"
+      ci-vue-build ./ "$FEATURE_PRE_ROOT/$MY_HOST" "$MY_HOST.apifeature.visipoint.dev"
+  environment:
+    name: $CI_COMMIT_BRANCH
+    url: http://$MY_HOST.appfeature.visipoint.dev/
+  only:
+    - vp-billing2
+  tags:
+    - feature
+

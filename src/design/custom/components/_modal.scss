@@ -1,0 +1,41 @@
+//.modal-dialog {
+//  max-width: none !important;
+//  width: 550px;
+//  height: auto;
+//  margin: auto;
+//  padding: 10px 0;
+//  margin: 30px auto;
+//}
+
+//.modal-body {
+//  width: 100%;
+//  min-height:100px;
+//  position: relative;
+//  // font-size: 19px;
+//  // font-weight: bold;
+//}
+//.modal-body, .modal-content{
+//  border-radius: 15px;
+//}
+.modal-content {
+  width:100%;
+  height: auto;
+  min-height: 100%;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+//@media only screen and (max-width: 670px){
+//  .modal-dialog {
+//    max-width: none !important;
+//    width:80%;
+//    padding:0;
+//    min-height:100vh;
+//  }
+  
+//}
+
+//@media only screen and (max-width: 800px){
+//  .modal-dialog {
+//    width:80%;
+//  }
+//}
