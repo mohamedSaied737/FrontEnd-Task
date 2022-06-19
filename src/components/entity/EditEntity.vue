@@ -344,7 +344,7 @@ export default {
 
   .close-btn{
     position: absolute;
-    top: 8%;
+    top: 6%;
     right: 5%;
     cursor: pointer;
     color: red;
