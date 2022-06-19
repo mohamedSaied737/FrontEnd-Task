@@ -46,13 +46,21 @@ export default {
     ]),
   },
   methods: {
+     updatedDetails (value) {
+        this.company.company_phone = value.entity.company_phone;
+        this.company.package = value.entity.package;
+        this.company.imageUrl = value.entity.imageUrl;
+        this.company.countryCode = value.entity.company_countryCode;
+         console.log(this.company);
+    },
     ...mapActions("modal", ["setData"]),
     ...mapActions("authfack", ["setCurrentEntity"]),
-    ...mapActions("users", ["fetchDocuments"]),
+    ...mapActions("users", ["fetchDocuments"])
   },
   beforeMount() {
     this.company = this.currentEntity;
     this.fetchDocuments();
+        console.log( this.company)
   },
 };
 </script>
@@ -61,74 +69,149 @@ export default {
 
   <Layout>
     <b-modal id="entityForm" hide-footer hide-header size="md" scrollable>
-      <EntityForm />
+      <EntityForm/>
     </b-modal>
     <b-modal id="editEntity" hide-footer hide-header size="md" scrollable>
-      <EditEntity />
+      <EditEntity  @editedForm="updatedDetails($event)"/>
     </b-modal>
     <PageHeader
       :title="title"
       className="d-flex align-items-center justify-content-between"
     >
     </PageHeader>
+    
     <div class="card">
       <div class="card-body">
-        <!-- dropdown -->
-        <b-button
-          variant="outline-primary"
-          pill
-          class="d-flex align-items-center text-center px-4 no-wrap float-right"
-          size="sm"
-          v-b-modal="'editEntity'"
-          @click.stop="setData(company)"
-        >
-          <i class="bx bx-edit-alt font-size-18 mr-2"></i>
-          Edit Company
-        </b-button>
-        <span class="drag-column-header">
-          <h2 class="card-title mb-4 pb-1">{{ company.name }}</h2>
-        </span>
-        <div class="card task-box">
-          <div class="card-body">
-            <!-- subdomain  -->
-            <b-form-group
-              class="align-items-center text-muted h5 no-wrap"
-              label-cols-sm="3"
-              label-cols-lg="2"
-              label="Subdomain:"
-              label-for="subdomain"
-            >
-              <h5 id="subdomain" class="text-primary mb-0 no-wrap">
-                {{ company.subdomain }}
-              </h5>
-            </b-form-group>
-            <!-- package  -->
-            <b-form-group
-              class="align-items-center text-muted h5 no-wrap"
-              label-cols-sm="3"
-              label-cols-lg="2"
-              label="Package:"
-              label-for="package"
-            >
-              <h5 id="package" class="text-primary mb-0 no-wrap">
-                {{ company.package }}
-              </h5>
-            </b-form-group>
-            <!-- kiosk  -->
-            <b-form-group
-              class="align-items-center text-muted h5 no-wrap"
-              label-cols-sm="3"
-              label-cols-lg="2"
-              label="kiosks:"
-              label-for="kiosk"
-            >
-              <h5 id="kiosk" class="text-primary mb-0 no-wrap">
-                {{ company.kiosks }}
-              </h5>
-            </b-form-group>
+        <div class="text-center">
+          <div class="camera-BG" v-if="!company.imageUrl">
+          <i class="mdi mdi-camera"></i>
           </div>
+          <p class="text-muted" v-if="!company.imageUrl"><b>Note: </b>Logo needs to be at least 200px width, 45px height and 2MB max size.</p>
+          <div  v-if="company.imageUrl">
+            <img :src="company.imageUrl" alt="" class="img-bg">
+          </div>
+          <b-button
+            variant="primary"
+            pill
+            class="px-5"
+            size="sm"
+            v-b-modal="'editEntity'"
+            @click.stop="setData(company)"
+          >
+            Edit 
+          </b-button>
+          <hr>
+        </div>
+        <div class="">
+        <div class="company-info row">
+          <div class="company-info__card col-12  col-sm-12 col-lg-4">
+            <div>
+              <h6 class="text-muted">Company Name</h6>
+              <p>{{ company.name }}</p>
+            </div>
+            <div>
+              <h6 class="text-muted">Phone Number</h6>
+              <p> +{{ company.countryCode}}{{ company.company_phone }}</p>
+            </div>
+          </div>
+    
+          <div class="company-info__card  col-12 col-sm-12 col-lg-4 ">
+            <div>
+            <h6 class="text-muted">Subdomain</h6>
+            <p>  {{ company.subdomain }}</p>
+            </div>
+            <div>
+            <h6 class="text-muted">Package</h6>
+            <p>  {{ company.package }}</p>
+        </div>
+          </div>
+          <div class="company-info__card col-sm-12 col-lg-4">
+            <h6 class="text-muted">Number of kiosks</h6>
+            <p>{{ company.kiosks }}</p>
+          </div>
+        </div>
         </div>
       </div>
     </div>
   </Layout>
 </template>
+
+<style lang="scss" scoped>
+.camera-BG {
+  display: inline-flex;
+  width: 100px;
+  height: 100px;
+  align-items: center;
+  justify-content: center;
+  background:#F2F2F2;
+  border-radius: 50%;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+ .img-bg {
+    width: 400px;
+    height: 100px;
+    border: none;
+    border-radius: 16px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+ .mdi{
+  font-size: 25pt;
+  color: #8C8C8C;
+}
+.company-info__card {
+  position: relative;
+
+  & > div {
+    margin-bottom: 20px;
+
+    &:last-child {
+      margin-bottom: 0;
+
+      @media  screen and (max-width: 991px) {
+        margin-bottom: 20px;
+    }
+    }
+  }
+
+  h6 {
+    margin-bottom: 5px;
+  }
+  p {
+    margin-bottom: 0;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 80%;
+    right: 0;
+    top: 10%;
+    background-color: grey;
+
+    @media  screen and (max-width: 991px) {
+      display: none;
+    }
+  }
+
+  &:last-child::after {
+    display: none;
+  }
+
+  @media screen and (min-width: 992px){
+    padding :0 60px;
+
+    &:first-child {
+      padding-left: 12px;
+    }
+
+    &:last-child {
+      padding-right: 12px;
+    }
+  }
+}
+
+</style>

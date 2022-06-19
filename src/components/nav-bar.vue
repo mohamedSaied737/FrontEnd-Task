@@ -118,6 +118,9 @@ export default {
   </header>
 </template>
 <style lang="scss" scoped>
+#page-topbar {
+  border-radius: 8px;
+}
 .navbar-inner,
 .navbar-header {
   align-items: center;
